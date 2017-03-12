@@ -5,4 +5,4 @@ class IsManagerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return request.user.person.role.get_description_display() == 'Manager'
+        return request.user.get_description_display() == 'Manager'
