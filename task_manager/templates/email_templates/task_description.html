@@ -1,0 +1,11 @@
+<div>
+    <p>Title: {{ task.title }} (id: {{ task.id }})</p>
+    <p>Description: {{ task.description }}</p>
+    <p>Due time: {{ task.due_date }}</p>
+    <p>Project: {{ task.project.title }}</p>
+    {% if user.is_manager %}
+        <p>Executor: {{ task.executor.username }} {{ task.executor.first_name }} {{ task.executor.last_name }}</p>
+    {% else %}
+        <p>Reporter: {{ task.reporter.username }} {{ task.reporter.first_name }} {{ task.reporter.last_name }}</p>
+    {% endif %}
+</div>

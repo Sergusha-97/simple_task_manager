@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ subject }}</title>
+</head>
+<body>
+    <div>
+        {% if expired_tasks %}
+            <h2>Expired tasks:</h2>
+            {% for task in expired_tasks %}
+                {% include 'email_templates/task_description.html' %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div>
+        {% if tasks %}
+            <h2>Managers gave you the following tasks:</h2>
+            {% for task in tasks %}
+                {% include 'email_templates/task_description.html' %}
+            {% endfor %}
+        {% else %}
+            <h2>Managers weren't give you new tasks</h2>
+        {% endif %}
+    </div>
+</body>
+</html>
