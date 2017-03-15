@@ -16,9 +16,10 @@ Including another URLconf
 from django.conf.urls import include
 from django.conf.urls import url
 from task_manager import urls
+
 # from django.contrib import admin
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
-    url(r'^$', include('task_manager.urls'))
+    url(r'^', include('task_manager.urls'))
 ]

@@ -9,7 +9,7 @@ class User(AbstractUser):
         (MANAGER, 'Manager'),
         (DEVELOPER, 'Developer'),
     )
-    role = models.CharField(max_length=10,null=False, blank=False,
+    role = models.CharField(max_length=10, null=False, blank=False,
                             choices=ROLES, default=MANAGER)
 
     def is_manager(self):
@@ -50,5 +50,3 @@ class Project(CommonInfo):
 
     def get_absolute_url(self):
         return 'projects/{}'.format(self.id)
-
-

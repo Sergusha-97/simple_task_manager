@@ -31,7 +31,7 @@ class IsTaskOwnerOrReadOnly(permissions.BasePermission):
             return True
         elif view.action in IsTaskOwnerOrReadOnly.ALLOWED_ACTIONS:
             return obj.executor == request.user
-            
+
 
 class IsSuperUserOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):

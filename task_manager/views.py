@@ -1,8 +1,9 @@
 from rest_framework import viewsets
 from rest_framework import permissions
+from task_manager.routines import send_task_to_user
 from task_manager.models import User, Project, Task
 from task_manager.permissions import IsManagerOrReadOnly, IsTaskOwnerOrReadOnly, IsSuperUserOrReadOnly
-from task_manager.serializers import ManagerSerializer,DeveloperSerializer, ProjectSerializer,\
+from task_manager.serializers import ManagerSerializer, DeveloperSerializer, ProjectSerializer, \
     DeveloperTaskSerializer, ManagerTaskSerializer
 
 
@@ -33,7 +34,14 @@ class TaskViewSet(viewsets.ModelViewSet):
                           IsTaskOwnerOrReadOnly,)
 
     def perform_create(self, serializer):
-        serializer.save(reporter=self.request.user)
+        task = serializer.save(reporter=self.request.user)
+        if not task.is_finished:
+            send_task_to_user.delay(task.executor.pk, task.pk, "Added a new task!")
+
+    def perform_update(self, serializer):
+        task = serializer.save()
+        if task.is_finished:
+            send_task_to_user.delay(task.reporter.pk, task.pk, "Task is finished!")
 
     def get_serializer_class(self):
         if self.request.user.is_anonymous or self.request.user.is_manager():

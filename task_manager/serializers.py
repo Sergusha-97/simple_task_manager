@@ -18,7 +18,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             last_name=validated_data['last_name'],
             role=validated_data['role'],
         )
-        return serializers.ModelSerializer.update(self, user, validated_data)
+        return user
 
     def update(self, instance, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
@@ -28,7 +28,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class ManagerSerializer(UserSerializer):
     controlled_tasks = serializers.PrimaryKeyRelatedField(many=True,
                                                           read_only=True)
-    role = serializers.HiddenField(default=0)
+    role = serializers.HiddenField(default=User.MANAGER)
 
     class Meta:
         model = User
@@ -38,7 +38,7 @@ class ManagerSerializer(UserSerializer):
 
 class DeveloperSerializer(UserSerializer):
     tasks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    role = serializers.HiddenField(default=1)
+    role = serializers.HiddenField(default=User.DEVELOPER)
 
     class Meta:
         model = User
@@ -46,30 +46,31 @@ class DeveloperSerializer(UserSerializer):
                   'email', 'password', 'projects', 'tasks', 'role')
 
 
-class DeveloperTaskSerializer(serializers.HyperlinkedModelSerializer):
+class TaskSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.CharField(source='get_absolute_url', read_only=True)
     reporter = serializers.PrimaryKeyRelatedField(read_only=True)
+
+
+class DeveloperTaskSerializer(TaskSerializer):
     executor = serializers.PrimaryKeyRelatedField(read_only=True)
     project = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Task
         fields = ('id', 'url', 'title', 'description', 'due_date',
-                  'is_finished', 'executor',  'reporter', 'project')
+                  'is_finished', 'executor', 'reporter', 'project')
         read_only_fields = ('id', 'url', 'title', 'description', 'due_date',
-                            'executor',  'reporter', 'project')
+                            'executor', 'reporter', 'project')
 
 
-class ManagerTaskSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.CharField(source='get_absolute_url', read_only=True)
-    reporter = serializers.PrimaryKeyRelatedField(read_only=True)
-    executor = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role=1))
+class ManagerTaskSerializer(TaskSerializer):
+    executor = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role=User.DEVELOPER))
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
 
     class Meta:
         model = Task
         fields = ('id', 'url', 'title', 'description', 'due_date',
-                  'is_finished', 'executor',  'reporter', 'project')
+                  'is_finished', 'executor', 'reporter', 'project')
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
